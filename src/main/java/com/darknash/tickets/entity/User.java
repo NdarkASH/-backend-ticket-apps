@@ -22,7 +22,6 @@ public class User extends BaseEntity {
 
     @Id
     @Column(unique = true, nullable = false, name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name", nullable = false)

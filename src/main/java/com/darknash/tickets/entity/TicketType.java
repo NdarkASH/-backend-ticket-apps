@@ -38,7 +38,7 @@ public class TicketType extends BaseEntity {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "ticketType", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ticketTypes", cascade = CascadeType.ALL)
     private List<Ticket> tickets;
 
 }

@@ -1,5 +1,6 @@
 package com.darknash.tickets.entity;
 
+import com.darknash.tickets.constant.TicketStatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,11 +31,14 @@ public class Ticket extends BaseEntity {
     @JoinColumn(name = "purchaser_id")
     private User purchaser;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_type_id")
+    private TicketType ticketTypes;
+
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
     private List<TicketValidation> validations;
 
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
     private List<QrCode> qrCodes;
-
 
 }

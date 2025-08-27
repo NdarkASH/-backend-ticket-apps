@@ -1,5 +1,7 @@
 package com.darknash.tickets.entity;
 
+import com.darknash.tickets.constant.TicketValidationMethod;
+import com.darknash.tickets.constant.TicketValidationStatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

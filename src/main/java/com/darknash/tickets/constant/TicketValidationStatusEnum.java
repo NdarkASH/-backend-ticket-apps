@@ -1,4 +1,4 @@
-package com.darknash.tickets.entity;
+package com.darknash.tickets.constant;
 
 public enum TicketValidationStatusEnum {
     VALID, INVALID, EXPIRED
