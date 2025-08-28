@@ -1,0 +1,28 @@
+<configuration>
+<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<file>logs/app.log</file>
+<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+<!-- Arsip per hari -->
+<fileNamePattern>logs/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+<!-- Simpan 30 hari -->
+<maxHistory>30</maxHistory>
+</rollingPolicy>
+
+<encoder>
+<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+</encoder>
+</appender>
+
+<!-- Console juga tetap jalan -->
+<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+<encoder>
+<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+</encoder>
+</appender>
+
+<!-- Root logger -->
+<root level="INFO">
+<appender-ref ref="FILE" />
+<appender-ref ref="CONSOLE" />
+</root>
+</configuration>

@@ -1,6 +1,6 @@
 package com.darknash.tickets.filters;
 
-import com.darknash.tickets.entity.User;
+import com.darknash.tickets.entities.User;
 import com.darknash.tickets.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

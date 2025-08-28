@@ -19,3 +19,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9090/realms/tickets
+
+logging:
+  file:
+    name: logs/app.log
+  level:
+    root: INFO
+    com.darknash.tickets: DEBUG
