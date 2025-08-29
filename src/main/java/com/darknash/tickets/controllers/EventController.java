@@ -84,7 +84,6 @@ public class EventController {
                 .build();
     }
 
-
     @DeleteMapping(path = "/{eventId}")
     public AppResponse<Void> deleteEvent(
             @AuthenticationPrincipal Jwt jwt,

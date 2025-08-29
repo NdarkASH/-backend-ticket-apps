@@ -1,11 +1,15 @@
 package com.darknash.tickets.services.implement;
 
+import com.darknash.tickets.constants.EventStatusEnum;
 import com.darknash.tickets.dtos.events.CreateEventRequest;
 import com.darknash.tickets.dtos.events.EventResponse;
 import com.darknash.tickets.dtos.events.UpdateEventRequest;
+import com.darknash.tickets.dtos.tickets.UpdateTicketTypeRequest;
 import com.darknash.tickets.entities.Event;
 import com.darknash.tickets.entities.TicketType;
 import com.darknash.tickets.entities.User;
+import com.darknash.tickets.exceptions.EventNotFoundException;
+import com.darknash.tickets.exceptions.TicketTypeNotFoundException;
 import com.darknash.tickets.exceptions.UserNotFoundException;
 import com.darknash.tickets.mappers.TicketTypeMapper;
 import com.darknash.tickets.repositories.EventRepository;
@@ -17,9 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -76,31 +80,86 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse updateEvent(UUID organizerId, UUID eventId, UpdateEventRequest eventRequest) {
-        return null;
+        Event existingEvent = eventRepository
+                .findByIdAndOrganizerId(organizerId, eventId)
+                .orElseThrow(() -> new EventNotFoundException(String.format("Event with id %s not found", eventId)));
+
+        existingEvent.setName(eventRequest.getName());
+        existingEvent.setEventStart(eventRequest.getStartTime());
+        existingEvent.setEventEnd(eventRequest.getEndTime());
+        existingEvent.setVenue(eventRequest.getVenue());
+        existingEvent.setSalesStart(eventRequest.getSalesStart());
+        existingEvent.setSalesEnd(eventRequest.getSalesEnd());
+        existingEvent.setStatus(eventRequest.getStatus());
+        eventRepository.save(existingEvent);
+
+        Set<UUID> requestTicketTypeIds = eventRequest.getTicketTypeRequests()
+                .stream()
+                .map(UpdateTicketTypeRequest::getId)
+                .filter(Objects::isNull).collect(Collectors.toSet());
+
+        existingEvent.getTicketTypes().removeIf(existingTicketType ->
+                !requestTicketTypeIds.contains(existingTicketType.getId())
+        );
+
+        Map<UUID, TicketType> existingTicketTypeIndex = existingEvent
+                .getTicketTypes()
+                .stream()
+                .collect(Collectors.toMap(TicketType::getId, Function.identity()));
+
+
+
+        for (UpdateTicketTypeRequest ticketTypeRequest : eventRequest.getTicketTypeRequests()) {
+//            Create
+            if (ticketTypeRequest.getId() == null) {
+                TicketType ticketTypeToCreate = new TicketType();
+                ticketTypeToCreate.setName(ticketTypeRequest.getName());
+                ticketTypeToCreate.setPrice(ticketTypeRequest.getPrice());
+                ticketTypeToCreate.setDescription(ticketTypeRequest.getDescription());
+                ticketTypeToCreate.setPrice(ticketTypeRequest.getPrice());
+                ticketTypeToCreate.setEvent(existingEvent);
+            } else if(existingTicketTypeIndex.containsKey(ticketTypeRequest.getId())) {
+//                Update
+                TicketType ticketTypeToUpdate = existingTicketTypeIndex.get(ticketTypeRequest.getId());
+                ticketTypeToUpdate.setName(ticketTypeRequest.getName());
+                ticketTypeToUpdate.setPrice(ticketTypeRequest.getPrice());
+                ticketTypeToUpdate.setDescription(ticketTypeRequest.getDescription());
+                ticketTypeToUpdate.setTotalAvaible(ticketTypeRequest.getTotalAvailable());
+            } else {
+                throw new TicketTypeNotFoundException(String
+                        .format("Ticket type with id %s not found", ticketTypeRequest.getId()));
+            }
+        }
+
+        Event savedEvent = eventRepository.save(existingEvent);
+        return toEventResponse(savedEvent);
     }
-
     @Override
-    public void deleteEvent(UUID organizerId, UUID eventId) {
-
+    @Transactional(rollbackFor = EventNotFoundException.class)
+    public void deleteEvent (UUID organizerId, UUID eventId) {
+        getEventForOrganizer(organizerId, eventId)
+                .ifPresent(eventResponse -> eventRepository.deleteById(eventId));
     }
 
     @Override
     public Page<EventResponse> listPublishedEvents(Pageable pageable) {
-        return null;
+        Page<Event> events= eventRepository.findByStatus(EventStatusEnum.PUBLISHED, pageable);
+        return events.map(this::toEventResponse);
     }
 
     @Override
-    public Page<EventResponse> searchPublishedEvents(Pageable pageable) {
-        return null;
+    public Page<EventResponse> searchPublishedEvents(String query, Pageable pageable) {
+        Page<Event> events = eventRepository.searchEvent(query, pageable);
+        return events.map(this::toEventResponse);
     }
 
     @Override
     public Optional<EventResponse> getPublishEvent(UUID id) {
-        return Optional.empty();
+        Optional<Event> eventResponse = eventRepository.findByIdAndStatus(id, EventStatusEnum.PUBLISHED);
+        return eventResponse.map(this::toEventResponse);
     }
 
-
-    private EventResponse toEventResponse (Event event) {
+    private EventResponse toEventResponse(Event event) {
         return EventResponse.builder()
                 .id(event.getId())
                 .name(event.getName())

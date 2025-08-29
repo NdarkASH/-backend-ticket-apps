@@ -1,6 +1,8 @@
 package com.darknash.tickets.dtos.events;
 
 import com.darknash.tickets.constants.EventStatusEnum;
+import com.darknash.tickets.dtos.tickets.UpdateTicketTypeRequest;
+import com.darknash.tickets.validation.MakerInterface;
 import com.darknash.tickets.dtos.tickets.CreateTicketTypeRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateEventRequest {
+
+    @NotNull(message = "Id is required")
     private UUID id;
     @NotBlank(message = "Event name is required")
     private String name;
@@ -31,5 +35,5 @@ public class UpdateEventRequest {
     @NotNull
     private EventStatusEnum status;
     @Builder.Default
-    private List<CreateTicketTypeRequest> ticketTypeRequests = new ArrayList<>();
+    private List<UpdateTicketTypeRequest> ticketTypeRequests = new ArrayList<>();
 }
