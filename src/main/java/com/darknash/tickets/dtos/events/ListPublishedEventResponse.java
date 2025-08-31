@@ -1,5 +1,6 @@
 package com.darknash.tickets.dtos.events;
 
+import com.darknash.tickets.constants.EventStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class ListPublishedEventResponse {
     private LocalDateTime start;
     private LocalDateTime end;
     private String venue;
+    private EventStatusEnum status;
 }

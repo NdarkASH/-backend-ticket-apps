@@ -26,3 +26,5 @@ logging:
   level:
     root: INFO
     com.darknash.tickets: DEBUG
+    org.keycloak: debug
+    org.springframework: debug

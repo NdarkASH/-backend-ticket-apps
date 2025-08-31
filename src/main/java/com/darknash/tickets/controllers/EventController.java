@@ -7,6 +7,9 @@ import com.darknash.tickets.dtos.events.CreateEventResponse;
 import com.darknash.tickets.dtos.events.EventResponse;
 import com.darknash.tickets.dtos.events.UpdateEventRequest;
 import com.darknash.tickets.services.EventService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,10 +25,19 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ApiPaths.EVENT)
+@SecurityRequirement(name = "bearerAuth")
 public class EventController {
     private final EventService eventService;
 
     @PostMapping
+    @Operation(
+            summary = "Buat Event Baru",
+            description = "Organizer membuat event baru",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Event berhasil dibuat"),
+                    @ApiResponse(responseCode = "400", description = "Request tidak valid")
+            }
+    )
     public AppResponse<EventResponse> createEvent(
             @AuthenticationPrincipal Jwt user,
             @Valid @RequestBody CreateEventRequest request) {

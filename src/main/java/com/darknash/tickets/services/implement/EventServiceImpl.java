@@ -3,6 +3,7 @@ package com.darknash.tickets.services.implement;
 import com.darknash.tickets.constants.EventStatusEnum;
 import com.darknash.tickets.dtos.events.CreateEventRequest;
 import com.darknash.tickets.dtos.events.EventResponse;
+import com.darknash.tickets.dtos.events.ListPublishedEventResponse;
 import com.darknash.tickets.dtos.events.UpdateEventRequest;
 import com.darknash.tickets.dtos.tickets.UpdateTicketTypeRequest;
 import com.darknash.tickets.entities.Event;
@@ -142,21 +143,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Page<EventResponse> listPublishedEvents(Pageable pageable) {
+    public Page<ListPublishedEventResponse> listPublishedEvents(Pageable pageable) {
         Page<Event> events= eventRepository.findByStatus(EventStatusEnum.PUBLISHED, pageable);
-        return events.map(this::toEventResponse);
+        return events.map(this::toListPublishedEventResponse);
     }
 
     @Override
-    public Page<EventResponse> searchPublishedEvents(String query, Pageable pageable) {
+    public Page<ListPublishedEventResponse> searchPublishedEvents(String query, Pageable pageable) {
         Page<Event> events = eventRepository.searchEvent(query, pageable);
-        return events.map(this::toEventResponse);
+        return events.map(this::toListPublishedEventResponse);
     }
 
     @Override
-    public Optional<EventResponse> getPublishEvent(UUID id) {
+    public Optional<ListPublishedEventResponse> getPublishEvent(UUID id) {
         Optional<Event> eventResponse = eventRepository.findByIdAndStatus(id, EventStatusEnum.PUBLISHED);
-        return eventResponse.map(this::toEventResponse);
+        return eventResponse.map(this::toListPublishedEventResponse);
     }
 
     private EventResponse toEventResponse(Event event) {
@@ -173,6 +174,16 @@ public class EventServiceImpl implements EventService {
                 .ticketType(event.getTicketTypes()
                         .stream()
                         .map(TicketTypeMapper::toResponse).toList())
+                .build();
+    }
+
+    private ListPublishedEventResponse toListPublishedEventResponse(Event event) {
+        return ListPublishedEventResponse.builder()
+                .id(event.getId())
+                .name(event.getName())
+                .venue(event.getVenue())
+                .start(event.getEventStart())
+                .end(event.getEventEnd())
                 .build();
     }
 }

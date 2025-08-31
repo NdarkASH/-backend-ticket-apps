@@ -19,6 +19,7 @@ public class User extends BaseEntity {
 
     @Id
     @Column(unique = true, nullable = false, name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name", nullable = false)
@@ -27,10 +28,11 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
     private List<Event> organizedEvents;
-
-
 
     @OneToMany(mappedBy = "payer", cascade = CascadeType.ALL)
     private List<Payment> tickets;

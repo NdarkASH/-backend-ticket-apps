@@ -7,4 +7,6 @@ public class ApiPaths {
     public static final String EVENT = BASE_API + "/events";
 
     public static final String PUBLISHEDEVENT = BASE_API + "/published-events";
+
+    public static final String LOGIN = BASE_API + "/login";
 }
